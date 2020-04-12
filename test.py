@@ -345,7 +345,8 @@ def testSchedule():
 def calculateTravel(day):
     #campuses = getCampuses()
 
-    return {'{} to {}'.format(meetingTuple[0]['courseName'],meetingTuple[1]['courseName']): getTravel(meetingTuple[0]['campus'],meetingTuple[1]['campus']) for meetingTuple in day.meetingTuples}
+    return {(meetingTuple[0]['courseName'],meetingTuple[0]['startTime'],meetingTuple[0]['endTime'],
+    meetingTuple[1]['courseName'],meetingTuple[1]['startTime'],meetingTuple[1]['endTime']): getTravel(meetingTuple[0]['campus'],meetingTuple[1]['campus']) for meetingTuple in day.meetingTuples}
 
 
 testSchedule()
