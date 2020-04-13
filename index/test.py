@@ -1,83 +1,10 @@
-import requests
-import json
-from requests_aws4auth import AWS4Auth
-import boto3
-from week import Week
+import handler
+import os
 
+os.environ['university'] = 'temple university'
 
-def getCampuses():
-    session = requests.Session()
-
-    APPSYNC_API_ENDPOINT_URL = 'https://taytm4ui6fhxjf3utp7p5foos4.appsync-api.us-east-2.amazonaws.com/graphql'
-
-    query = """query GetCampuses(
-      $school: String = "temple",
-      $term: Int = 202036,
-      $method: String = "getCampuses"
-      ) {
-      getBannerMetadata(school: $school, term: $term, method: $method) {
-         code
-         description
-      }
-      }"""
-
-    response = session.request(
-        url=APPSYNC_API_ENDPOINT_URL,
-        method='POST',
-        headers={'x-api-key': getAPIKey('appsync_key')},
-        json={'query': query}
-    )
-
-    campusDict = {}
-
-    for i in response.json()['data']['getBannerMetadata']:
-        campusDict[i['code']] = i['description']
-
-    return campusDict
-
-
-def getAPIKey(key):
-    with open('api_key.json') as f:
-        data = json.load(f)
-
-    return data[key]
-
-
-def testBingMaps():
-    url = 'http://dev.virtualearth.net/REST/v1/Routes/Driving'
-
-    params = {'waypoint.1': '{{temple university main campus}}',
-              'waypoint.2': '{{temple university center city }}',
-              'key': getAPIKey('bing_key'),
-              'distanceUnit': 'mi'
-              }
-
-    r = requests.get(url, params=params)
-    result = json.loads(r.text)
-
-    print(result['resourceSets'][0]["resources"][0]["travelDistance"])
-    print(result['resourceSets'][0]["resources"][0]["travelDuration"])
-    print(result['resourceSets'][0]["resources"][0]["travelDurationTraffic"])
-
-def getTravel(waypoint1, waypoint2):
-    url = 'http://dev.virtualearth.net/REST/v1/Routes/Driving'
-
-    params = {'waypoint.1': '{{temple university {}}}'.format(waypoint1),
-              'waypoint.2': '{{temple university {}}}'.format(waypoint2),
-              'key': getAPIKey('bing_key'),
-              'distanceUnit': 'mi'
-              }
-
-    r = requests.get(url, params=params)
-    result = json.loads(r.text)
-
-    return {'distance': result['resourceSets'][0]["resources"][0]["travelDistance"],
-    'duration': result['resourceSets'][0]["resources"][0]["travelDuration"],
-    'durationTraffic': result['resourceSets'][0]["resources"][0]["travelDurationTraffic"]
-    }
-
-def testSchedule():
-    schedule = [
+event = {'weeknum': 1,
+    'schedule': [
         {
             "isOpen": True,
             "campus": "Center City",
@@ -250,7 +177,7 @@ def testSchedule():
             "crn": 25550
         },
         {
-            "campus": "Main",
+            "campus": "Ambler",
             "meetingTimes": [
                 {
                     "saturday": False,
@@ -337,17 +264,6 @@ def testSchedule():
             "crn": 2184
         }
     ]
+}
 
-    sortedWeek = Week(schedule, 16)
-
-    print(calculateTravel(sortedWeek.tuesday))
-    
-def calculateTravel(day):
-    #campuses = getCampuses()
-
-    return {(meetingTuple[0]['courseName'],meetingTuple[0]['startTime'],meetingTuple[0]['endTime'],
-    meetingTuple[1]['courseName'],meetingTuple[1]['startTime'],meetingTuple[1]['endTime']): 
-    getTravel(meetingTuple[0]['campus'],meetingTuple[1]['campus']) for meetingTuple in day.meetingTuples}
-
-
-testSchedule()
+print(handler.lambda_handler(event, None))

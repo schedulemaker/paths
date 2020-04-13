@@ -1,8 +1,6 @@
-from day import Day
-
 class Week():
 
-    def __init__(self, schedule, weeknum):
+    def __init__(self, Day, schedule, weeknum):
         self.monday = None
         self.tuesday = None
         self.wednesday = None
@@ -11,9 +9,9 @@ class Week():
         self.saturday = None
         self.sunday = None
         
-        self.sortedDays(schedule, weeknum)
+        self.sortedDays(Day, schedule, weeknum)
 
-    def sortedDays(self, schedule, weeknum):
+    def sortedDays(self, Day, schedule, weeknum):
         days = [[] for i in range(7)]
 
         for course in schedule:
