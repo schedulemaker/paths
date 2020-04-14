@@ -1,6 +1,6 @@
 import cache
 
-boto3, Day, Week, requests, json, AWS4Auth, asyncio, os = cache.exports()
+Day, Week, requests, json, AWS4Auth, asyncio, os = cache.exports()
 
 loop = asyncio.get_event_loop()
 
@@ -19,8 +19,10 @@ async def job(event, context):
     calculateTravel(sortedWeek.friday), calculateTravel(sortedWeek.saturday), calculateTravel(sortedWeek.sunday)]
 
     results = await asyncio.gather(*tasks)
+    weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 
-    return {'weeklyTravel': results,
+
+    return {'weeklyTravel': dict(zip(weekdays,results)),
     'totalDuration': sum(map(lambda day: sum(travel['duration'] for travel in day.values()), results)),
     'totalDurationTraffic': sum(map(lambda day: sum(travel['durationTraffic'] for travel in day.values()), results)),
     'totalDistance': sum(map(lambda day: sum(travel['distance'] for travel in day.values()), results))
@@ -32,35 +34,35 @@ def getAPIKey(key):
 
     return data[key]
 
-async def getCampuses():
-    session = requests.Session()
+# async def getCampuses():
+#     session = requests.Session()
 
-    APPSYNC_API_ENDPOINT_URL = 'https://taytm4ui6fhxjf3utp7p5foos4.appsync-api.us-east-2.amazonaws.com/graphql'
+#     APPSYNC_API_ENDPOINT_URL = 'https://taytm4ui6fhxjf3utp7p5foos4.appsync-api.us-east-2.amazonaws.com/graphql'
 
-    query = """query GetCampuses(
-      $school: String = "temple",
-      $term: Int = 202036,
-      $method: String = "getCampuses"
-      ) {
-      getBannerMetadata(school: $school, term: $term, method: $method) {
-         code
-         description
-      }
-      }"""
+#     query = """query GetCampuses(
+#       $school: String = "temple",
+#       $term: Int = 202036,
+#       $method: String = "getCampuses"
+#       ) {
+#       getBannerMetadata(school: $school, term: $term, method: $method) {
+#          code
+#          description
+#       }
+#       }"""
 
-    response = session.request(
-        url=APPSYNC_API_ENDPOINT_URL,
-        method='POST',
-        headers={'x-api-key': getAPIKey('appsync_key')},
-        json={'query': query}
-    )
+#     response = session.request(
+#         url=APPSYNC_API_ENDPOINT_URL,
+#         method='POST',
+#         headers={'x-api-key': getAPIKey('appsync_key')},
+#         json={'query': query}
+#     )
 
-    campusDict = {}
+#     campusDict = {}
 
-    for i in response.json()['data']['getBannerMetadata']:
-        campusDict[i['code']] = i['description']
+#     for i in response.json()['data']['getBannerMetadata']:
+#         campusDict[i['code']] = i['description']
 
-    return campusDict
+#     return campusDict
 
 async def getTravel(waypoint1, waypoint2):
     university = os.environ['university']
@@ -84,6 +86,6 @@ async def getTravel(waypoint1, waypoint2):
 async def calculateTravel(day):
     #campuses = getCampuses()
 
-    return {(meetingTuple[0]['campus'],meetingTuple[0]['startTime'],meetingTuple[0]['endTime'],
-    meetingTuple[1]['campus'],meetingTuple[1]['startTime'],meetingTuple[1]['endTime']): 
-    await getTravel(meetingTuple[0]['campus'],meetingTuple[1]['campus']) for meetingTuple in day.meetingTuples}
+    return {(meetingTuple[0]['campusName'],meetingTuple[0]['startTime'],meetingTuple[0]['endTime'],
+    meetingTuple[1]['campusName'],meetingTuple[1]['startTime'],meetingTuple[1]['endTime']): 
+    await getTravel(meetingTuple[0]['campusName'],meetingTuple[1]['campusName']) for meetingTuple in day.meetingTuples}

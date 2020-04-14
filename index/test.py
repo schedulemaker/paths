@@ -7,7 +7,7 @@ event = {'weeknum': 1,
     'schedule': [
         {
             "isOpen": True,
-            "campus": "Center City",
+            "campusName": "Center City",
             "meetingTimes": [
                 {
                     "saturday": False,
@@ -50,7 +50,7 @@ event = {'weeknum': 1,
         },
         {
             "isOpen": True,
-            "campus": "Main",
+            "campusName": "Main",
             "meetingTimes": [
                 {
                     "saturday": False,
@@ -126,7 +126,7 @@ event = {'weeknum': 1,
             "crn":4308
         },
         {
-            "campus": "Main",
+            "campusName": "Main",
             "meetingTimes": [
                 {
                     "saturday": False,
@@ -177,7 +177,7 @@ event = {'weeknum': 1,
             "crn": 25550
         },
         {
-            "campus": "Ambler",
+            "campusName": "Ambler",
             "meetingTimes": [
                 {
                     "saturday": False,

@@ -15,7 +15,7 @@ class Week():
         days = [[] for i in range(7)]
 
         for course in schedule:
-            dictAppend = {'campus': course['campus'],
+            dictAppend = {'campusName': course['campusName'],
             'courseName': course['courseName']}
             for meetingTime in course['meetingTimes']:
                 if weeknum in meetingTime['weeks']:
