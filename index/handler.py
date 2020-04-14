@@ -86,6 +86,6 @@ async def getTravel(waypoint1, waypoint2):
 async def calculateTravel(day):
     #campuses = getCampuses()
 
-    return {(meetingTuple[0]['campusName'],meetingTuple[0]['startTime'],meetingTuple[0]['endTime'],
+    return {'{},{},{},{},{},{}'.format(meetingTuple[0]['campusName'],meetingTuple[0]['startTime'],meetingTuple[0]['endTime'],
     meetingTuple[1]['campusName'],meetingTuple[1]['startTime'],meetingTuple[1]['endTime']): 
     await getTravel(meetingTuple[0]['campusName'],meetingTuple[1]['campusName']) for meetingTuple in day.meetingTuples}
