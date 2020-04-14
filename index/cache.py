@@ -10,11 +10,9 @@ def exports():
         import requests
     if 'json' not in local and 'json' not in globa:
         import json
-    if 'AWS4Auth' not in local and 'AWS4Auth' not in globa:
-        from requests_aws4auth import AWS4Auth
     if 'asyncio' not in local and 'asyncio' not in globa:
         import asyncio
     if 'os' not in local and 'os' not in globa:
         import os
 
-    return Day, Week, requests, json, AWS4Auth, asyncio, os
+    return Day, Week, requests, json, asyncio, os

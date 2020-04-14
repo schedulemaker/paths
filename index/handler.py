@@ -1,6 +1,6 @@
 import cache
 
-Day, Week, requests, json, AWS4Auth, asyncio, os = cache.exports()
+Day, Week, requests, json, asyncio, os = cache.exports()
 
 loop = asyncio.get_event_loop()
 
