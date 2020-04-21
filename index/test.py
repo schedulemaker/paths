@@ -3,6 +3,9 @@ import os
 
 os.environ['university'] = 'temple university'
 
+#add key here to test
+os.environ['bing_key'] = None
+
 event = {'weeknum': 1,
     'schedule': [
         {

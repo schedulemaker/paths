@@ -29,10 +29,12 @@ async def job(event, context):
     }
 
 def getAPIKey(key):
-    with open('api_key.json') as f:
-        data = json.load(f)
+    #with open('api_key.json') as f:
+    #    data = json.load(f)
 
-    return data[key]
+    #return data[key]
+
+    return os.environ[key]
 
 # async def getCampuses():
 #     session = requests.Session()
