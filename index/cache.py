@@ -14,5 +14,7 @@ def exports():
         import asyncio
     if 'os' not in local and 'os' not in globa:
         import os
+    if 'deepcopy' not in local and 'deepcopy' not in globa:
+        from copy import deepcopy
 
-    return Day, Week, requests, json, asyncio, os
+    return Day, Week, requests, json, asyncio, os, deepcopy

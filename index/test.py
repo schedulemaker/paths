@@ -180,7 +180,7 @@ event = {'weeknum': 1,
             "crn": 25550
         },
         {
-            "campusName": "Ambler",
+            "campusName": "Main",
             "meetingTimes": [
                 {
                     "saturday": False,
@@ -238,7 +238,7 @@ event = {'weeknum': 1,
                         16
                     ],
                     "thursday":True,
-                    "building":"PEARMC",
+                    "building":"RTTERX",
                     "room":"0P015",
                     "instructors":[
                         "Kyle Harris",

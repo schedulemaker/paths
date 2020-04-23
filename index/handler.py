@@ -1,8 +1,68 @@
 import cache
 
-Day, Week, requests, json, asyncio, os = cache.exports()
+Day, Week, requests, json, asyncio, os, deepcopy = cache.exports()
 
 loop = asyncio.get_event_loop()
+
+buildings = {"1300CB":"1300 CECIL B MOORE AVENUE",
+"1700NB":"1700 N. BROAD STREET",
+"1810LW":"1810 LIACOURAS WALK",
+"1940NR":"1940 RESIDENCE HALL-LIACOURAS WALK",
+"ALTER":"ALTER HALL AUDITORIUM",
+"AMBRHT":"AMBLER-BRIGHT HALL",
+"AMCOTT":"AMBLER-COTTAGE HALL",
+"AMDIXN":"AMBLER DIXON HALL",
+"AMDOUG":"AMBLER-DOUGLASS",
+"AMGYM":"AMBLER GYMNASIUM",
+"AMJUST":"AMBLER-HILDA JUSTICE HALL",
+"AMLBRY":"AMBLER LIBRARY",
+"AMLRNC":"AMBLER LEARNING CENTER",
+"AMNGRN":"AMBLER GREENHOUSE",
+"AMROSE":"AMBLER-ROSE COTTAGE",
+"AMWIDE":"AMBLER-WIDENER HALL",
+"ANDRSN":"ANDERSON HALL",
+"ANNBRG":"ANNENBERG HALL",
+"AZABU":"AZABU HALL",
+"BARTNA":"BARTON HALL (A)",
+"BARTNB":"BARTON HALL (B)",
+"BEURY":"BEURY HALL",
+"BIOSCI":"BIOLOGY-LIFE SCIENCES",
+"CNWELL":"CONWELL HALL",
+"ENGARC":"ENGINEERING BUILDING",
+"FWCCTR":"TU FORT WASHINGTON",
+"GLFLTR":"GLADFELTER HALL",
+"HCHERS":"HARRISBURG-HERSEY",
+"HCHUNT":"HARRISBURG-HUNTINGDON",
+"HCLANC":"HARRISBURG-LANCASTER",
+"HCPOTT":"HARRISBURG-POTTSVILLE",
+"HGSC":"HOWARD GITTIS STUDENT CENTER",
+"HRSBG":"HARRISBURG CAMPUS",
+"JONES":"JONES HALL",
+"JPNANX":"JAPAN CAMPUS ANNEX",
+"KRESGE":"KRESGE SCIENCE HALL",
+"MCGONH":"MCGONIGLE HALL",
+"MEDRB":"MEDICAL RESEARCH BUILDING",
+"MITA":"MITA HALL",
+"MITTEN":"MITTEN HALL",
+"MITTENX":"MITTEN ANNEX",
+"OLDDNT":"DENTAL SCHOOL",
+"PEARSH":"PEARSON HALL",
+"PHRMAH":"PHARMACY-ALLIED HEALTH",
+"PODMED":"COLLEGE OF PODIATRIC MEDICINE",
+"PRESSR":"PRESSER HALL",
+"RITTER":"RITTER HALL",
+"ROCKHL":"ROCK HALL",
+"RTTERX":"RITTER ANNEX",
+"SFC":"STUDENT FACULTY CENTER",
+"SPKMAN":"SPEAKMAN HALL",
+"STUPAV":"STUDENT PAVILION RECREATION FACILITIES",
+"TMLSON":"TOMLINSON HALL",
+"TTLMAN":"TUTTLEMAN",
+"TUCC":"TUCC 1515 MARKET STREET",
+"TYLER":"TYLER SCHOOL OF ART",
+"WCHMAN":"WACHMAN HALL",
+"WEISS":"WEISS HALL"
+}
 
 def lambda_handler(event,context):
     return loop.run_until_complete(job(event,context))
@@ -66,10 +126,10 @@ def getAPIKey(key):
 
 #     return campusDict
 
-async def getTravel(waypoint1, waypoint2):
+async def getTravel(waypoint1, waypoint2, walking=False):
     university = os.environ['university']
 
-    url = 'http://dev.virtualearth.net/REST/v1/Routes/Driving'
+    url = 'http://dev.virtualearth.net/REST/v1/Routes/Walking' if walking else 'http://dev.virtualearth.net/REST/v1/Routes/Driving'
 
     params = {'waypoint.1': '{{{} {}}}'.format(university, waypoint1),
               'waypoint.2': '{{{} {}}}'.format(university, waypoint2),
@@ -87,7 +147,19 @@ async def getTravel(waypoint1, waypoint2):
 
 async def calculateTravel(day):
     #campuses = getCampuses()
+    newList = []
+
+    for meetingTuple in day.meetingTuples:
+        if (meetingTuple[0]['campusName'] == meetingTuple[1]['campusName'] and
+        meetingTuple[0]['building'] != None and meetingTuple[1]['building'] != None):
+            meetingTuple = deepcopy(meetingTuple)
+            meetingTuple[0]['campusName'] = buildings.get(meetingTuple[0]['building'],meetingTuple[0]['building']).title()
+            meetingTuple[1]['campusName'] = buildings.get(meetingTuple[1]['building'],meetingTuple[1]['building']).title()
+            meetingTuple[0]['walking'] = True
+        else:
+            meetingTuple[0]['walking'] = False
+        newList.append(meetingTuple)
 
     return {'{},{},{},{},{},{}'.format(meetingTuple[0]['campusName'],meetingTuple[0]['startTime'],meetingTuple[0]['endTime'],
     meetingTuple[1]['campusName'],meetingTuple[1]['startTime'],meetingTuple[1]['endTime']): 
-    await getTravel(meetingTuple[0]['campusName'],meetingTuple[1]['campusName']) for meetingTuple in day.meetingTuples}
+    await getTravel(meetingTuple[0]['campusName'],meetingTuple[1]['campusName'],meetingTuple[0]['walking']) for meetingTuple in newList}
